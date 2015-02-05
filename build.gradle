@@ -1,8 +1,8 @@
 subprojects {
   apply plugin: 'java'
 
-  group=com.aruberto
-  version=0.0.1
+  group = 'com.aruberto.businessdatetime'
+  version = '0.0.1'
 
   repositories {
     jcenter()
