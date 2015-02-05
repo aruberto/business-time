@@ -1,4 +1,4 @@
-package com.aruberto.businessdatetime.joda;
+package com.aruberto.businesstime.joda;
 
 import org.joda.time.Chronology;
 import org.joda.time.ReadableDateTime;
