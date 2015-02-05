@@ -25,7 +25,7 @@ In second case, since there are only 1.5 business hours remaining on Thursday, t
 Provides BusinessDateTime class which extends [org.joda.time.base.AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html) and adds following additional operations:
 
 #### BusinessDateTime plusMillis(long millis)
-    Return a new BusinessDateTime that is current business time plus the additional business millis specified
+* Return a new BusinessDateTime that is current business time plus the additional business millis specified
 
 ### business-time-jsr310
 
