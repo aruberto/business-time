@@ -1,0 +1,20 @@
+subprojects {
+  apply plugin: 'java'
+
+  group=com.aruberto
+  version=0.0.1
+
+  repositories {
+    jcenter()
+  }
+
+  configurations {
+    compile.transitive = false
+    testCompile.transitive = false
+  }
+
+  jar {
+    manifest.attributes 'Gradle-Version': GradleVersion.current().toString(), 
+      'Created-By': org.gradle.internal.jvm.Jvm.current()
+  }
+}
