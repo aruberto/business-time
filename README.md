@@ -26,6 +26,6 @@ Provides following classes:
 
 * com.github.aruberto.businesstime.joda.BusinessDateTime which extends [org.joda.time.base.AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
 
-### business-time-jsr310
+### business-time-jdk8
 
 Sorry, still in the works ...

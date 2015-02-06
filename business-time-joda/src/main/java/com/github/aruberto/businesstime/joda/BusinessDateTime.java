@@ -2,8 +2,8 @@ package com.github.aruberto.businesstime.joda;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
-import net.objectlab.kit.datecalc.common.HolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
+import net.objectlab.kit.datecalc.common.KitCalculatorsFactory;
 import net.objectlab.kit.datecalc.common.WorkingWeek;
 import net.objectlab.kit.datecalc.joda.JodaWorkingWeek;
 import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
@@ -50,11 +50,11 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * with business day starting at {@code dayStartTime}, business day ending at {@code dayEndTime},
    * holiday list of {@code holidays} and working week of {@code workingWeek}
    *
-   * @param dateTime  date time, null means current time with default time zone
-   * @param dayStartTime  business day start time, null means 9am
-   * @param dayEndTime  business day end time, null means 5pm
-   * @param holidays  holidays, null means no holidays
-   * @param workingWeek  the working week, null means Monday to Friday
+   * @param dateTime date time, null means current time with default time zone
+   * @param dayStartTime business day start time, null means 9am
+   * @param dayEndTime business day end time, null means 5pm
+   * @param holidays holidays, null means no holidays
+   * @param workingWeek the working week, null means Monday to Friday
    */
   public BusinessDateTime(DateTime dateTime,
                           LocalTime dayStartTime,
@@ -92,10 +92,10 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * with business day starting at {@code dayStartTime}, business day ending at {@code dayEndTime},
    * holiday list of {@code holidays} and working week of Monday to Friday
    *
-   * @param dateTime  date time, null means current time with default time zone
-   * @param dayStartTime  business day start time, null means 9am
-   * @param dayEndTime  business day end time, null means 5pm
-   * @param holidays  holidays, null means no holidays
+   * @param dateTime date time, null means current time with default time zone
+   * @param dayStartTime business day start time, null means 9am
+   * @param dayEndTime business day end time, null means 5pm
+   * @param holidays holidays, null means no holidays
    */
   public BusinessDateTime(DateTime dateTime,
                           LocalTime dayStartTime,
@@ -109,8 +109,8 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * with business day starting at 9am, business day ending at 5pm,
    * holiday list of {@code holidays} and working week of Monday to Friday
    *
-   * @param dateTime  date time, null means current time with default time zone
-   * @param holidays  holidays, null means no holidays
+   * @param dateTime date time, null means current time with default time zone
+   * @param holidays holidays, null means no holidays
    */
   public BusinessDateTime(DateTime dateTime, Set<LocalDate> holidays) {
     this(dateTime, null, null, holidays, null);
@@ -121,9 +121,9 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * with business day starting at {@code dayStartTime}, business day ending at {@code dayEndTime},
    * no holidays and working week of Monday to Friday
    *
-   * @param dateTime  date time, null means current time with default time zone
-   * @param dayStartTime  business day start time, null means 9am
-   * @param dayEndTime  business day end time, null means 5pm
+   * @param dateTime date time, null means current time with default time zone
+   * @param dayStartTime business day start time, null means 9am
+   * @param dayEndTime business day end time, null means 5pm
    */
   public BusinessDateTime(DateTime dateTime, LocalTime dayStartTime, LocalTime dayEndTime) {
     this(dateTime, dayStartTime, dayEndTime, null, null);
@@ -134,7 +134,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * with business day starting at 9am, business day ending at 5pm,
    * no holidays and working week of Monday to Friday
    *
-   * @param dateTime  date time, null means current time with default time zone
+   * @param dateTime date time, null means current time with default time zone
    */
   public BusinessDateTime(DateTime dateTime) {
     this(dateTime, null, null, null, null);
@@ -149,40 +149,49 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
     this(new DateTime(), null, null, null, null);
   }
 
-  protected static DateTime plusBusinessDays(DateTime startDateTime,
-                                             LocalTime dayStartTime,
-                                             LocalTime dayEndTime,
-                                             Set<LocalDate> holidays,
-                                             WorkingWeek workingWeek,
-                                             long days) {
-    LocalDateKitCalculatorsFactory calculatorFactory = new LocalDateKitCalculatorsFactory();
-    HolidayCalendar<LocalDate> holidayCalendar = new DefaultHolidayCalendar<LocalDate>(holidays);
-    calculatorFactory.registerHolidays(HOLIDAY_KEY, holidayCalendar);
+  protected BusinessDateTime moveByMillis(long millisToMove) {
+    long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
+    KitCalculatorsFactory<LocalDate> calculatorFactory = new LocalDateKitCalculatorsFactory()
+        .registerHolidays(HOLIDAY_KEY, new DefaultHolidayCalendar<LocalDate>(holidays));
 
-    LocalDate startDate = startDateTime.toLocalDate();
-    LocalTime startTime = startDateTime.toLocalTime();
-    DateTimeZone zone = startDateTime.getZone();
+    LocalDate startDate = dateTime.toLocalDate();
+    LocalTime startTime = dateTime.toLocalTime();
 
     // When outside business hours, assume current time is previous business moment
-    LocalTime endTime = startTime;
-    if (endTime.isAfter(dayEndTime) ||
-        endTime.isBefore(dayStartTime) ||
-        holidays.contains(startDate) ||
-        !workingWeek.isWorkingDay(startDate.toDate())) {
-      // If current day is working day and current time is before business start of day,
-      // need to roll back to previous day
-      if (endTime.isBefore(dayStartTime) &&
-          !holidays.contains(startDate) &&
-          workingWeek.isWorkingDay(startDate.toDate())) {
-        days--;
-      }
+    boolean workingDay = workingWeek.isWorkingDay(startDate.toDate()) &&
+                         !holidays.contains(startDate);
+    boolean beforeDayStart = startTime.isBefore(dayStartTime);
+    boolean afterDayEnd = startTime.isAfter(dayEndTime);
 
-      // Previous business moment is always at business end of day
-      endTime = dayEndTime;
+    long days = 0;
+    long millis = millisToMove;
+
+    if (millis >= 0) {
+      if (workingDay) {
+        if (beforeDayStart) {
+          days--;
+          millis += millisPerDay;
+        } else {
+          millis +=
+              Math.min(millisPerDay, startTime.getMillisOfDay() - dayStartTime.getMillisOfDay());
+        }
+      }
+    } else {
+      if (workingDay) {
+        if (afterDayEnd) {
+          days++;
+          millis -= millisPerDay;
+        } else {
+          millis -=
+              Math.min(millisPerDay, dayEndTime.getMillisOfDay() - startTime.getMillisOfDay());
+        }
+      }
     }
 
-    String holidayHandlerType = days > 0 ? HolidayHandlerType.FORWARD : HolidayHandlerType.BACKWARD;
+    days += (millis - 1) / millisPerDay;
+    millis = (millis - 1) % millisPerDay + 1;
 
+    String holidayHandlerType = days > 0 ? HolidayHandlerType.FORWARD : HolidayHandlerType.BACKWARD;
     DateCalculator<LocalDate> calc =
         calculatorFactory.getDateCalculator(HOLIDAY_KEY, holidayHandlerType);
     calc.setWorkingWeek(workingWeek);
@@ -192,13 +201,21 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
       calc = calc.moveByBusinessDays((int) days);
     }
 
-    return calc.getCurrentBusinessDate().toDateTime(endTime, zone);
+    LocalDate endDate = calc.getCurrentBusinessDate();
+    LocalTime endTime = (millis > 0 ? dayStartTime : dayEndTime).plusMillis((int) millis);
+
+    return new BusinessDateTime(
+        endDate.toDateTime(endTime, dateTime.getZone()),
+        dayStartTime,
+        dayEndTime,
+        holidays,
+        workingWeek);
   }
 
   /**
    * Gets the chronology of the datetime.
    *
-   * @return  the Chronology that the datetime is using
+   * @return the Chronology that the datetime is using
    */
   public Chronology getChronology() {
     return dateTime.getChronology();
@@ -208,50 +225,23 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * Gets the milliseconds of the datetime instant from the Java epoch
    * of 1970-01-01T00:00:00Z.
    *
-   * @return  the number of milliseconds since 1970-01-01T00:00:00Z
+   * @return the number of milliseconds since 1970-01-01T00:00:00Z
    */
   public long getMillis() {
-    return plusBusinessDays(dateTime,
-                            dayStartTime,
-                            dayEndTime,
-                            holidays,
-                            workingWeek,
-                            0).getMillis();
+    return moveByMillis(0).dateTime.getMillis();
   }
 
   /**
    * Returns a copy of this business datetime plus {@code millis} millis.
    *
-   * @param millis  the amount of millis to add, may be negative
-   * @return  the new business datetime plus the increased millis
+   * @param millis the amount of millis to add, may be negative
+   * @return the new business datetime plus the increased millis
    */
   public BusinessDateTime plusMillis(long millis) {
     if (millis == 0L) {
       return this;
     } else {
-      long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
-
-      // Step 1 - Add provided millis to current millis elapsed in the day (max of millisPerDay)
-      long totalMillis = millis;
-      DateTime startOfDay = dateTime.withMillisOfDay(dayStartTime.getMillisOfDay());
-      if (!holidays.contains(dateTime.toLocalDate()) &&
-          workingWeek.isWorkingDay(dateTime.toDate()) &&
-          dateTime.isAfter(startOfDay)) {
-        totalMillis += Math.min(dateTime.getMillis() - startOfDay.getMillis(), millisPerDay);
-      }
-
-      // Step 2 - Calculate how many business days and millis to move forward
-      long businessDays = totalMillis / millisPerDay;
-      long remainingMillis = totalMillis % millisPerDay;
-
-      // Step 3 - Move forward business days then just add remaining millis
-      DateTime newDateTime = plusBusinessDays(startOfDay,
-                                              dayStartTime,
-                                              dayEndTime,
-                                              holidays,
-                                              workingWeek,
-                                              businessDays).plus(remainingMillis);
-      return new BusinessDateTime(newDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
+      return moveByMillis(millis);
     }
   }
 }
