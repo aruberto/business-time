@@ -61,7 +61,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
                           Set<LocalDate> holidays,
                           WorkingWeek workingWeek) {
     if (dateTime == null) {
-      throw new IllegalArgumentException("date time cannot be null");
+      throw new NullPointerException("date time cannot be null");
     }
     if (dayStartTime == null) {
       dayStartTime = DEFAULT_BUSINESS_DAY_START;
@@ -75,8 +75,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
     if (workingWeek == null) {
       workingWeek = JodaWorkingWeek.DEFAULT;
     }
-    if (dayEndTime.isEqual(dayStartTime) ||
-        dayEndTime.isBefore(dayStartTime)) {
+    if (dayEndTime.isEqual(dayStartTime) || dayEndTime.isBefore(dayStartTime)) {
       throw new IllegalArgumentException("business day end time must be after start time");
     }
     this.dateTime = dateTime;
@@ -157,17 +156,18 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
     LocalTime startTime = dateTime.toLocalTime();
 
     // When outside business hours, assume current time is previous business moment
-    boolean workingDay = workingWeek.isWorkingDay(startDate.toDate()) &&
-                         !holidays.contains(startDate);
-    boolean beforeDayStart = startTime.isBefore(dayStartTime);
-    boolean afterDayEnd = startTime.isAfter(dayEndTime);
+    boolean isWorkingDay = workingWeek.isWorkingDay(startDate.toDate()) &&
+                           !holidays.contains(startDate);
+    boolean isStartBeforeBusinessDay = startTime.isBefore(dayStartTime);
+    boolean isStartAfterBusinessDay = startTime.isAfter(dayEndTime);
 
-    long days = 0L;
+    // Calculate the number of days and millis to move. millis should end up being <= millisPerDay.
+    long days = 0;
     long millis = millisToMove;
 
-    if (millis >= 0L) {
-      if (workingDay) {
-        if (beforeDayStart) {
+    if (millis >= 0) {
+      if (isWorkingDay) {
+        if (isStartBeforeBusinessDay) {
           days--;
           millis += millisPerDay;
         } else {
@@ -176,8 +176,8 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
         }
       }
     } else {
-      if (workingDay) {
-        if (afterDayEnd) {
+      if (isWorkingDay) {
+        if (isStartAfterBusinessDay) {
           days++;
           millis -= millisPerDay;
         } else {
@@ -195,7 +195,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
         calculatorFactory.getDateCalculator(HOLIDAY_KEY, holidayHandlerType);
     calc.setWorkingWeek(workingWeek);
     calc.setStartDate(startDate);
-    if (days != 0L) {
+    if (days != 0) {
       calc = calc.moveByBusinessDays((int) days);
     }
 
@@ -236,10 +236,24 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    * @return the new business datetime plus the increased millis
    */
   public BusinessDateTime plusMillis(long millis) {
-    if (millis == 0L) {
+    if (millis == 0) {
       return this;
     } else {
       return moveByMillis(millis);
+    }
+  }
+
+  /**
+   * Returns a copy of this business datetime minus {@code millis} millis.
+   *
+   * @param millis the amount of millis to subtract, may be negative
+   * @return the new business datetime minus the decreased millis
+   */
+  public BusinessDateTime minusMillis(long millis) {
+    if (millis == 0) {
+      return this;
+    } else {
+      return moveByMillis(-millis);
     }
   }
 }
