@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class BusinessDateTimeTest {
 
   @Test
-  public void plusBusinessMillis_Add3Millis_DateTime3MillisLater() {
+  public void plusBusinessMillis_Plus3Millis_DateTime3MillisLater() {
     DateTime start = new DateTime(2014, 12, 11, 12, 0, 0, 0);
     DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 3);
     BusinessDateTime businessStart = new BusinessDateTime(start);
@@ -19,18 +19,18 @@ public class BusinessDateTimeTest {
   }
 
   @Test
-  public void plusBusinessMillis_Sub3Millis_DateTime3MillisBefore() {
+  public void plusBusinessMillis_Minus3Millis_DateTime3MillisBefore() {
     DateTime start = new DateTime(2014, 12, 11, 12, 0, 0, 3);
     DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
     assertEquals("Thursday 12:00:00:003 minus 3 millis should return Thursday 12:00:00:000",
                  expected,
-                 businessStart.plusMillis(-3).toDateTime());
+                 businessStart.minusMillis(3).toDateTime());
   }
 
   @Test
-  public void plusBusinessMillis_Add3MillisEndOfDay_DateTime3MillisLaterNextDay() {
+  public void plusBusinessMillis_Plus3MillisEndOfDay_DateTime3MillisLaterNextDay() {
     DateTime start = new DateTime(2014, 12, 11, 16, 59, 59, 999);
     DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 2);
     BusinessDateTime businessStart = new BusinessDateTime(start);
@@ -41,14 +41,14 @@ public class BusinessDateTimeTest {
   }
 
   @Test
-  public void plusBusinessMillis_Sub3MillisBeginOfDay_DateTime3MillisBeforePreviousDay() {
+  public void plusBusinessMillis_Minus3MillisBeginOfDay_DateTime3MillisBeforePreviousDay() {
     DateTime start = new DateTime(2014, 12, 12, 9, 0, 0, 2);
     DateTime expected = new DateTime(2014, 12, 11, 16, 59, 59, 999);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
     assertEquals("Friday 9:00:00:002 minus 3 millis should return Thursday 16:59:59:999",
                  expected,
-                 businessStart.plusMillis(-3).toDateTime());
+                 businessStart.minusMillis(3).toDateTime());
   }
 
   @Test
