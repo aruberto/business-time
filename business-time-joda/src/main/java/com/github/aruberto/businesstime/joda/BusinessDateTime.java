@@ -4,7 +4,6 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
 import net.objectlab.kit.datecalc.common.KitCalculatorsFactory;
-import net.objectlab.kit.datecalc.common.WorkingWeek;
 import net.objectlab.kit.datecalc.joda.JodaWorkingWeek;
 import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
 
@@ -42,7 +41,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
   private final Set<LocalDate> holidays;
   private final LocalTime dayStartTime;
   private final LocalTime dayEndTime;
-  private final WorkingWeek workingWeek;
+  private final JodaWorkingWeek workingWeek;
 
   /**
    * Constructs an instance of BusinessDateTime at point of time of {@code dateTime}
@@ -59,7 +58,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
                           LocalTime dayStartTime,
                           LocalTime dayEndTime,
                           Set<LocalDate> holidays,
-                          WorkingWeek workingWeek) {
+                          JodaWorkingWeek workingWeek) {
     if (dateTime == null) {
       throw new NullPointerException("date time cannot be null");
     }
@@ -156,8 +155,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
     LocalTime startTime = dateTime.toLocalTime();
 
     // When outside business hours, assume current time is previous business moment
-    boolean isWorkingDay = workingWeek.isWorkingDay(startDate.toDate()) &&
-                           !holidays.contains(startDate);
+    boolean isWorkingDay = workingWeek.isWorkingDay(startDate) && !holidays.contains(startDate);
     boolean isStartBeforeBusinessDay = startTime.isBefore(dayStartTime);
     boolean isStartAfterBusinessDay = startTime.isAfter(dayEndTime);
 
