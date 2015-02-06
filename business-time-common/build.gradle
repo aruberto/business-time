@@ -2,11 +2,7 @@ sourceCompatibility=1.5
 targetCompatibility=1.5
 
 dependencies {
-  compile project(':business-time-common')
-
-  compile 'joda-time:joda-time:2.7'
   compile 'net.objectlab.kit:datecalc-common:1.4.0'
-  compile 'net.objectlab.kit:datecalc-joda:1.4.0'
 
   testCompile 'junit:junit:4.12'
 }

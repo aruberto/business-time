@@ -1,9 +1,11 @@
 package com.github.aruberto.businesstime.joda;
 
+import com.github.aruberto.businesstime.common.BusinessDateTimeCalculator;
+import com.github.aruberto.businesstime.common.BusinessDateTimeCalculatorResult;
+
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
-import net.objectlab.kit.datecalc.common.KitCalculatorsFactory;
 import net.objectlab.kit.datecalc.joda.JodaWorkingWeek;
 import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
 
@@ -147,65 +149,24 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
   }
 
   protected BusinessDateTime moveByMillis(long millisToMove) {
-    long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
-    KitCalculatorsFactory<LocalDate> calculatorFactory = new LocalDateKitCalculatorsFactory()
-        .registerHolidays(HOLIDAY_KEY, new DefaultHolidayCalendar<LocalDate>(holidays));
+    DateCalculator<LocalDate> calc = new LocalDateKitCalculatorsFactory()
+        .registerHolidays(HOLIDAY_KEY, new DefaultHolidayCalendar<LocalDate>(holidays))
+        .getDateCalculator(HOLIDAY_KEY, HolidayHandlerType.FORWARD_UNLESS_MOVING_BACK)
+        .setWorkingWeek(workingWeek);
 
-    LocalDate startDate = dateTime.toLocalDate();
-    LocalTime startTime = dateTime.toLocalTime();
+    BusinessDateTimeCalculator<LocalDate> businessCalc =
+        new BusinessDateTimeCalculator<LocalDate>();
+    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.moveByMillis(
+        dateTime.toLocalDate(),
+        dateTime.toLocalTime().getMillisOfDay(),
+        millisToMove,
+        dayStartTime.getMillisOfDay(),
+        dayEndTime.getMillisOfDay(),
+        calc);
 
-    // When outside business hours, assume current time is previous business moment
-    boolean isWorkingDay = workingWeek.isWorkingDay(startDate) && !holidays.contains(startDate);
-    boolean isStartBeforeBusinessDay = startTime.isBefore(dayStartTime);
-    boolean isStartAfterBusinessDay = startTime.isAfter(dayEndTime);
-
-    // Calculate the number of days and millis to move. millis should end up being <= millisPerDay.
-    long days = 0;
-    long millis = millisToMove;
-
-    if (millis >= 0) {
-      if (isWorkingDay) {
-        if (isStartBeforeBusinessDay) {
-          days--;
-          millis += millisPerDay;
-        } else {
-          millis +=
-              Math.min(millisPerDay, startTime.getMillisOfDay() - dayStartTime.getMillisOfDay());
-        }
-      }
-    } else {
-      if (isWorkingDay) {
-        if (isStartAfterBusinessDay) {
-          days++;
-          millis -= millisPerDay;
-        } else {
-          millis -=
-              Math.min(millisPerDay, dayEndTime.getMillisOfDay() - startTime.getMillisOfDay());
-        }
-      }
-    }
-
-    days += (millis - 1) / millisPerDay;
-    millis = (millis - 1) % millisPerDay + 1;
-
-    String holidayHandlerType = days > 0 ? HolidayHandlerType.FORWARD : HolidayHandlerType.BACKWARD;
-    DateCalculator<LocalDate> calc =
-        calculatorFactory.getDateCalculator(HOLIDAY_KEY, holidayHandlerType);
-    calc.setWorkingWeek(workingWeek);
-    calc.setStartDate(startDate);
-    if (days != 0) {
-      calc = calc.moveByBusinessDays((int) days);
-    }
-
-    LocalDate endDate = calc.getCurrentBusinessDate();
-    LocalTime endTime = (millis > 0 ? dayStartTime : dayEndTime).plusMillis((int) millis);
-
-    return new BusinessDateTime(
-        endDate.toDateTime(endTime, dateTime.getZone()),
-        dayStartTime,
-        dayEndTime,
-        holidays,
-        workingWeek);
+    LocalTime endTime = new LocalTime(0, 0, 0, 0).plusMillis(result.getMillisOfDay());
+    DateTime endDateTime = result.getEndDate().toDateTime(endTime, dateTime.getZone());
+    return new BusinessDateTime(endDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
   }
 
   /**
