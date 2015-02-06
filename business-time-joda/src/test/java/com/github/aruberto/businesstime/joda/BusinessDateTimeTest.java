@@ -24,7 +24,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Thursday 12:00:00:003 subtract 3 millis should return Thursday 12:00:00:000",
+    assertEquals("Thursday 12:00:00:003 minus 3 millis should return Thursday 12:00:00:000",
                  expected,
                  businessStart.plusMillis(-3).toDateTime());
   }
@@ -38,6 +38,17 @@ public class BusinessDateTimeTest {
     assertEquals("Thursday 16:59:59:999 plus 3 millis should return Friday 9:00:00:002",
                  expected,
                  businessStart.plusMillis(3).toDateTime());
+  }
+
+  @Test
+  public void plusBusinessMillis_Sub3MillisBeginOfDay_DateTime3MillisBeforePreviousDay() {
+    DateTime start = new DateTime(2014, 12, 12, 9, 0, 0, 2);
+    DateTime expected = new DateTime(2014, 12, 11, 16, 59, 59, 999);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 9:00:00:002 minus 3 millis should return Thursday 16:59:59:999",
+                 expected,
+                 businessStart.plusMillis(-3).toDateTime());
   }
 
   @Test

@@ -10,7 +10,6 @@ import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
 
 import org.joda.time.Chronology;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.joda.time.ReadableDateTime;
@@ -163,10 +162,10 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
     boolean beforeDayStart = startTime.isBefore(dayStartTime);
     boolean afterDayEnd = startTime.isAfter(dayEndTime);
 
-    long days = 0;
+    long days = 0L;
     long millis = millisToMove;
 
-    if (millis >= 0) {
+    if (millis >= 0L) {
       if (workingDay) {
         if (beforeDayStart) {
           days--;
@@ -196,8 +195,7 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
         calculatorFactory.getDateCalculator(HOLIDAY_KEY, holidayHandlerType);
     calc.setWorkingWeek(workingWeek);
     calc.setStartDate(startDate);
-    if (days != 0) {
-      // hopefully never move by more than 2^31-1 days
+    if (days != 0L) {
       calc = calc.moveByBusinessDays((int) days);
     }
 
