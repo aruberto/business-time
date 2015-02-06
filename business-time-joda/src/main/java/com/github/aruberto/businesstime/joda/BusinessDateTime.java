@@ -1,4 +1,4 @@
-package com.aruberto.businesstime.joda;
+package com.github.aruberto.businesstime.joda;
 
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
@@ -200,7 +200,6 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    *
    * @return  the Chronology that the datetime is using
    */
-  @Override
   public Chronology getChronology() {
     return dateTime.getChronology();
   }
@@ -211,7 +210,6 @@ public class BusinessDateTime extends AbstractDateTime implements ReadableDateTi
    *
    * @return  the number of milliseconds since 1970-01-01T00:00:00Z
    */
-  @Override
   public long getMillis() {
     return plusBusinessDays(dateTime,
                             dayStartTime,

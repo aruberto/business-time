@@ -24,7 +24,7 @@ In second case, since there are only 1.5 business hours remaining on Thursday, t
 
 Provides following classes:
 
-* com.aruberto.businesstime.joda.BusinessDateTime which extends [org.joda.time.base.AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
+* com.github.aruberto.businesstime.joda.BusinessDateTime which extends [org.joda.time.base.AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
 
 ### business-time-jsr310
 

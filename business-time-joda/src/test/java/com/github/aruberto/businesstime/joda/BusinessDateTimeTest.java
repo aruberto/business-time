@@ -1,4 +1,4 @@
-package com.aruberto.businesstime.joda;
+package com.github.aruberto.businesstime.joda;
 
 import org.joda.time.DateTime;
 import org.junit.Test;
