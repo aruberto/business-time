@@ -1,0 +1,11 @@
+sourceCompatibility=1.8
+targetCompatibility=1.8
+
+dependencies {
+  compile project(':business-time-common')
+
+  compile 'net.objectlab.kit:datecalc-common:1.4.0'
+  compile 'net.objectlab.kit:datecalc-jdk8:1.4.0'
+
+  testCompile 'junit:junit:4.12'
+}
