@@ -32,39 +32,44 @@ public class BusinessDateTimeCalculator<E> {
     boolean isStartBeforeBusinessDay = startTimeMillisOfDay < dayStartMillisOfDay;
     boolean isStartAfterBusinessDay = startTimeMillisOfDay > dayEndMillisOfDay;
 
-    long daysAdjustment = 0;
-    long totalMillis = millisToMove;
+    int days = 0;
+    int millisOfDay = 0;
 
-    if (isWorkingDay) {
-      if (totalMillis >= 0) {
+    if (millisToMove >= 0) {
+      long totalMillis = millisToMove;
+      if (isWorkingDay) {
         // Adjust days/millis to be in reference to current business day at business hours start
-        if (isStartBeforeBusinessDay) {
-          // If start time is before business hours, then current business date time
-          // is actually previous day at business end time
-          daysAdjustment--;
-          totalMillis += millisPerDay;
-        } else {
-          // Add millis elapsed in current business day
-          totalMillis += Math.min(millisPerDay, startTimeMillisOfDay - dayStartMillisOfDay);
-        }
-      } else {
-        // Adjust days/millis to be in reference to current business day at business hours end
         if (isStartAfterBusinessDay) {
           // If start time is after business hours, then current business date time
-          // is actually next day at business start time
-          daysAdjustment++;
-          totalMillis -= millisPerDay;
+          // is actually next day at business hour start
+          days++;
         } else {
-          // Subtract millis remaining in day
-          totalMillis -= Math.min(millisPerDay, dayEndMillisOfDay - startTimeMillisOfDay);
+          // Add millis elapsed in current business day
+          totalMillis += Math.max(0, startTimeMillisOfDay - dayStartMillisOfDay);
         }
       }
-    }
 
-    // Calculate the number of days and millisOfDay to move.
-    // millisOfDay should end up being <= millisPerDay.
-    int days = (int) ((totalMillis - 1) / millisPerDay + daysAdjustment);
-    int millisOfDay = (int) ((totalMillis - 1) % millisPerDay + 1);
+      // Calculate the number of days and millisOfDay to move.
+      // millisOfDay should end up being <= millisPerDay.
+      days += (int) ((totalMillis - 1) / millisPerDay);
+      millisOfDay += (int) ((totalMillis - 1) % millisPerDay + 1);
+    } else {
+      long totalMillis = millisToMove;
+      // Adjust days/millis to be in reference to current business day at business hours end
+      if (isStartBeforeBusinessDay) {
+        // If start time is before business hours, then current business date time
+        // is actually next day at business start time
+        days--;
+      } else {
+        // Subtract millis remaining in day
+        totalMillis -= Math.max(0, dayEndMillisOfDay - startTimeMillisOfDay);
+      }
+
+      // Calculate the number of days and millisOfDay to move.
+      // millisOfDay should end up being <= millisPerDay.
+      days += (int) ((totalMillis + 1) / millisPerDay);
+      millisOfDay += (int) ((totalMillis + 1) % millisPerDay - 1);
+    }
 
     // Use DateCalculator to calculate new business day
     calc.setStartDate(startDate);
@@ -75,7 +80,7 @@ public class BusinessDateTimeCalculator<E> {
 
     // When millisOfDay is positive, time was added and reference time is business hour start
     // When millisOfDay is negative, time was subtracted and reference time is business hour end
-    int endTimeMillisOfDay = millisOfDay > 0 ? dayStartMillisOfDay : dayEndMillisOfDay;
+    int endTimeMillisOfDay = millisOfDay >= 0 ? dayStartMillisOfDay : dayEndMillisOfDay;
     endTimeMillisOfDay += millisOfDay;
 
     return new BusinessDateTimeCalculatorResult<E>(endDate, endTimeMillisOfDay);
