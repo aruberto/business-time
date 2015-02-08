@@ -107,6 +107,19 @@ public final class BusinessDateTime
   }
 
   /**
+   * Constructs an instance of BusinessDateTime at current time in system time zone
+   * with business day starting at {@code dayStartTime}, business day ending at {@code dayEndTime},
+   * holiday list of {@code holidays} and working week of Monday to Friday
+   *
+   * @param dayStartTime business day start time, null means 9am
+   * @param dayEndTime business day end time, null means 5pm
+   * @param holidays holidays, null means no holidays
+   */
+  public BusinessDateTime(LocalTime dayStartTime, LocalTime dayEndTime, Set<LocalDate> holidays) {
+    this(new DateTime(), dayStartTime, dayEndTime, holidays, null);
+  }
+
+  /**
    * Constructs an instance of BusinessDateTime at point of time of {@code dateTime}
    * with business day starting at 9am, business day ending at 5pm,
    * holiday list of {@code holidays} and working week of Monday to Friday
@@ -116,6 +129,17 @@ public final class BusinessDateTime
    */
   public BusinessDateTime(DateTime dateTime, Set<LocalDate> holidays) {
     this(dateTime, null, null, holidays, null);
+  }
+
+  /**
+   * Constructs an instance of BusinessDateTime at current time in system time zone
+   * with business day starting at 9am, business day ending at 5pm,
+   * holiday list of {@code holidays} and working week of Monday to Friday
+   *
+   * @param holidays holidays, null means no holidays
+   */
+  public BusinessDateTime(Set<LocalDate> holidays) {
+    this(new DateTime(), null, null, holidays, null);
   }
 
   /**
@@ -129,6 +153,18 @@ public final class BusinessDateTime
    */
   public BusinessDateTime(DateTime dateTime, LocalTime dayStartTime, LocalTime dayEndTime) {
     this(dateTime, dayStartTime, dayEndTime, null, null);
+  }
+
+  /**
+   * Constructs an instance of BusinessDateTime at current time in system time zone
+   * with business day starting at {@code dayStartTime}, business day ending at {@code dayEndTime},
+   * no holidays and working week of Monday to Friday
+   *
+   * @param dayStartTime business day start time, null means 9am
+   * @param dayEndTime business day end time, null means 5pm
+   */
+  public BusinessDateTime(LocalTime dayStartTime, LocalTime dayEndTime) {
+    this(new DateTime(), dayStartTime, dayEndTime, null, null);
   }
 
   /**
