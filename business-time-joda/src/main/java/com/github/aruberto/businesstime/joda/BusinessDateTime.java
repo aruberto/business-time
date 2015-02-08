@@ -7,6 +7,7 @@ import com.github.aruberto.businesstime.common.Constants;
 import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
+import net.objectlab.kit.datecalc.common.WorkingWeek;
 import net.objectlab.kit.datecalc.joda.JodaWorkingWeek;
 import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
 
@@ -62,7 +63,7 @@ public final class BusinessDateTime
                           LocalTime dayStartTime,
                           LocalTime dayEndTime,
                           Set<LocalDate> holidays,
-                          JodaWorkingWeek workingWeek) {
+                          WorkingWeek workingWeek) {
     if (dateTime == null) {
       throw new NullPointerException("date time cannot be null");
     }
@@ -76,7 +77,7 @@ public final class BusinessDateTime
       holidays = Collections.emptySet();
     }
     if (workingWeek == null) {
-      workingWeek = JodaWorkingWeek.DEFAULT;
+      workingWeek = WorkingWeek.DEFAULT;
     }
     if (dayEndTime.isEqual(dayStartTime) || dayEndTime.isBefore(dayStartTime)) {
       throw new IllegalArgumentException("business day end time must be after start time");
@@ -85,7 +86,7 @@ public final class BusinessDateTime
     this.dayStartTime = dayStartTime;
     this.dayEndTime = dayEndTime;
     this.holidays = holidays;
-    this.workingWeek = workingWeek;
+    this.workingWeek = new JodaWorkingWeek(workingWeek);
   }
 
   /**
