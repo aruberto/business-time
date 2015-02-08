@@ -67,6 +67,18 @@ new BusinessDateTime(holidays); // current time with Christmas and New Year's as
 
 #### Manipulating BusinessDateTime
 
+BusinessDateTime provides a set of plusX and minusX methods to add/subtract time where X is any of Millis/Seconds/Minutes/Hours/Days/Weeks/Months/Years. Since BusinessDateTime is immutable, all plusX/minusX methods return a new instance of BusinessDateTime:
+
+```java
+BusinessDateTime dateTime = new BusinessDateTime(new DateTime(2014, 12, 11, 15, 30, 0, 0)); // Thurs Dec 11, 2014 @ 3:30 PM
+time.plusHours(1); // Thurs Dec 11, 2014 @ 4:30 PM
+time.plusHours(2); // Fri Dec 12, 2014 @ 9:30 AM - remaining 30 min are added to next day
+time.plusMinutes(30); // // Thurs Dec 11, 2014 @ 4:00 PM
+time.minusMinutes(30); // // Thurs Dec 11, 2014 @ 3:00 PM
+```
+
+* note that Weeks/Months/Years methods simply delegate to Joda's plus/minus methods and perform no business time calculations
+
 ### business-time-jdk8
 
 Sorry, still in the works ...
