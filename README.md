@@ -10,21 +10,62 @@ Assume business hours are from 9am to 5pm.
 
 1) When time added/subtracted doesn't overflow outside business hours, business datetime behaves just like regular datetime
 
-    Thursday 3:30pm + 1 business hour = Thursday 4:30pm
+`Thursday 3:30pm + 1 business hour = Thursday 4:30pm`
 
 2) However when time added/subtracted does overflow outside business hours, non-business time is skipped over
 
-    Thursday 3:30pm + 2 business hours = Friday 9:30am
+`Thursday 3:30pm + 2 business hours = Friday 9:30am`
 
 In second case, since there are only 1.5 business hours remaining on Thursday, the remaining 0.5 hours to add are continued on Friday.
 
 ## Projects
 
+### business-time-common
+
+Common business time calculation methods. Dependency of following projects and not meant to be used directly.
+
 ### business-time-joda
 
-Provides following classes:
+Provides class BusinessDateTime which extends Joda's [AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
 
-* com.github.aruberto.businesstime.joda.BusinessDateTime which extends [org.joda.time.base.AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
+#### Creating BusinessDateTime
+
+The default constructor builds an instance of BusinessDateTime using the current system time, in the system time zone, 9-17 business hours, no holidays and Mon-Fri working week:
+
+```java
+new BusinessDateTime(); // current time
+```
+
+To create an instance of BusinessDateTime that is not current time, simply provide an instance of Joda's [DateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/DateTime.html):
+
+```java
+new BusinessDateTime(new DateTime(2014, 12, 11, 9, 15, 0, 0)); // Thurs Dec 11, 2014 @ 9:15 AM
+```
+
+If the time specified is outside business hours, BusinessDateTime becomes next possible business moment:
+
+```java
+new BusinessDateTime(new DateTime(2014, 12, 11, 8, 45, 0, 0)); // Thurs Dec 11, 2014 @ 9:00 AM since 8:45 AM is before business hours
+new BusinessDateTime(new DateTime(2014, 12, 11, 17, 15, 0, 0)); // Fri Dec 12, 2014 @ 9:00 AM since 5:15 PM is after business hours
+new BusinessDateTime(new DateTime(2014, 12, 13, 12, 0, 0, 0)); // Mon Dec 15, 2014 @ 9:00 AM since Dec 13 is weekend
+```
+
+If your business doesn't work standard 9-17 hours, provide business day start/end times as instances of Joda's [LocalTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/LocalTime.html):
+
+```java
+new BusinessDateTime(new LocalTime(9, 30, 0, 0), new LocalTime(17, 30, 0, 0)); // current time with business hours of 9:30-17:30
+```
+
+To specify which days are holidays, provide a set of instances of Joda's [LocalDate](http://joda-time.sourceforge.net/apidocs/org/joda/time/LocalDate.html):
+
+```java
+Set<LocalDate> holidays = new HashSet<>();
+holidays.add(new LocalDate(2014, 12, 25)); // Christmas
+holidays.add(new LocalDate(2015, 1, 1)); // New Year
+new BusinessDateTime(holidays); // current time with Christmas and New Year's as holidays
+```
+
+#### Manipulating BusinessDateTime
 
 ### business-time-jdk8
 
