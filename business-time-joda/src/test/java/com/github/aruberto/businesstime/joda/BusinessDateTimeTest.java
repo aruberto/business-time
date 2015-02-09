@@ -86,7 +86,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 3);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Thursday 12:00:00:000 plus 3 millis should return Thursday 12:00:00:003",
+    assertEquals("Thursday 12:00:00:000 plus 3 Millis should return Thursday 12:00:00:003",
                  expected,
                  businessStart.plusMillis(3).toDateTime());
   }
@@ -97,7 +97,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 2);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Thursday 16:59:59:999 plus 3 millis should return Friday 9:00:00:002",
+    assertEquals("Thursday 16:59:59:999 plus 3 Millis should return Friday 9:00:00:002",
                  expected,
                  businessStart.plusMillis(3).toDateTime());
   }
@@ -108,7 +108,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 11, 17, 0, 0, 0);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Thursday 16:59:59:997 plus 3 millis should return Thursday 17:00:00:000",
+    assertEquals("Thursday 16:59:59:997 plus 3 Millis should return Thursday 17:00:00:000",
                  expected,
                  businessStart.plusMillis(3).toDateTime());
   }
@@ -119,7 +119,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Thursday 12:00:00:003 minus 3 millis should return Thursday 12:00:00:000",
+    assertEquals("Thursday 12:00:00:003 minus 3 Millis should return Thursday 12:00:00:000",
                  expected,
                  businessStart.minusMillis(3).toDateTime());
   }
@@ -130,7 +130,7 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 11, 16, 59, 59, 999);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Friday 9:00:00:002 minus 3 millis should return Thursday 16:59:59:999",
+    assertEquals("Friday 9:00:00:002 minus 3 Millis should return Thursday 16:59:59:999",
                  expected,
                  businessStart.minusMillis(3).toDateTime());
   }
@@ -141,8 +141,206 @@ public class BusinessDateTimeTest {
     DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 0);
     BusinessDateTime businessStart = new BusinessDateTime(start);
 
-    assertEquals("Friday 9:00:00:003 minus 3 millis should return Friday 9:00:00:000",
+    assertEquals("Friday 9:00:00:003 minus 3 Millis should return Friday 9:00:00:000",
                  expected,
                  businessStart.minusMillis(3).toDateTime());
+  }
+
+  @Test
+  public void plusSeconds_3Seconds_3SecondsLater() {
+    DateTime start = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 12, 0, 3, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 12:00:00:000 plus 3 Seconds should return Thursday 12:00:03:000",
+                 expected,
+                 businessStart.plusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void plusSeconds_3SecondsEndOfDay_3SecondsLaterNextDay() {
+    DateTime start = new DateTime(2014, 12, 11, 16, 59, 59, 999);
+    DateTime expected = new DateTime(2014, 12, 12, 9, 0, 2, 999);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 16:59:59:999 plus 3 Seconds should return Friday 9:00:02:999",
+                 expected,
+                 businessStart.plusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void plusSeconds_3Seconds3SecondsBeforeEndOfDay_EndOfDay() {
+    DateTime start = new DateTime(2014, 12, 11, 16, 59, 57, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 17, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 16:59:57:000 plus 3 Seconds should return Thursday 17:00:00:000",
+                 expected,
+                 businessStart.plusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void minusSeconds_3Seconds_3SecondsBefore() {
+    DateTime start = new DateTime(2014, 12, 11, 12, 0, 3, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 12:00:03:000 minus 3 Seconds should return Thursday 12:00:00:000",
+                 expected,
+                 businessStart.minusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void minusSeconds_3SecondsBeginOfDay_3SecondsBeforePreviousDay() {
+    DateTime start = new DateTime(2014, 12, 12, 9, 0, 2, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 16, 59, 59, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 9:00:02:000 minus 3 Seconds should return Thursday 16:59:59:000",
+                 expected,
+                 businessStart.minusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void minusSeconds_3Seconds3SecondsAfterStartOfDay_StartOfDay() {
+    DateTime start = new DateTime(2014, 12, 12, 9, 0, 3, 0);
+    DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 9:00:03:000 minus 3 Seconds should return Friday 9:00:00:000",
+                 expected,
+                 businessStart.minusSeconds(3).toDateTime());
+  }
+
+  @Test
+  public void plusMinutes_3Minutes_3MinutesLater() {
+    DateTime start = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 12, 3, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 12:00:00:000 plus 3 Minutes should return Thursday 12:03:00:000",
+                 expected,
+                 businessStart.plusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void plusMinutes_3MinutesEndOfDay_3MinutesLaterNextDay() {
+    DateTime start = new DateTime(2014, 12, 11, 16, 59, 59, 999);
+    DateTime expected = new DateTime(2014, 12, 12, 9, 2, 59, 999);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 16:59:59:999 plus 3 Minutes should return Friday 9:03:59:999",
+                 expected,
+                 businessStart.plusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void plusMinutes_3Minutes3MinutesBeforeEndOfDay_EndOfDay() {
+    DateTime start = new DateTime(2014, 12, 11, 16, 57, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 17, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 16:57:00:000 plus 3 Minutes should return Thursday 17:00:00:000",
+                 expected,
+                 businessStart.plusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void minusMinutes_3Minutes_3MinutesBefore() {
+    DateTime start = new DateTime(2014, 12, 11, 12, 3, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 12:03:00:000 minus 3 Minutes should return Thursday 12:00:00:000",
+                 expected,
+                 businessStart.minusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void minusMinutes_3MinutesBeginOfDay_3MinutesBeforePreviousDay() {
+    DateTime start = new DateTime(2014, 12, 12, 9, 2, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 16, 59, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 9:02:00:000 minus 3 Minutes should return Thursday 16:59:00:000",
+                 expected,
+                 businessStart.minusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void minusMinutes_3Minutes3MinutesAfterStartOfDay_StartOfDay() {
+    DateTime start = new DateTime(2014, 12, 12, 9, 3, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 9:03:00:000 minus 3 Minutes should return Friday 9:00:00:000",
+                 expected,
+                 businessStart.minusMinutes(3).toDateTime());
+  }
+
+  @Test
+  public void plusHours_3Hours_3HoursLater() {
+    DateTime start = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 15, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 12:00:00:000 plus 3 Hours should return Thursday 15:00:00:000",
+                 expected,
+                 businessStart.plusHours(3).toDateTime());
+  }
+
+  @Test
+  public void plusHours_3HoursEndOfDay_3HoursLaterNextDay() {
+    DateTime start = new DateTime(2014, 12, 11, 16, 59, 59, 999);
+    DateTime expected = new DateTime(2014, 12, 12, 11, 59, 59, 999);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 16:59:59:999 plus 3 Hours should return Friday 11:59:59:999",
+                 expected,
+                 businessStart.plusHours(3).toDateTime());
+  }
+
+  @Test
+  public void plusHours_3Hours3HoursBeforeEndOfDay_EndOfDay() {
+    DateTime start = new DateTime(2014, 12, 11, 14, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 17, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 14:00:00:000 plus 3 Hours should return Thursday 17:00:00:000",
+                 expected,
+                 businessStart.plusHours(3).toDateTime());
+  }
+
+  @Test
+  public void minusHours_3Hours_3HoursBefore() {
+    DateTime start = new DateTime(2014, 12, 11, 15, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 12, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Thursday 15:00:00:000 minus 3 Hours should return Thursday 12:00:00:000",
+                 expected,
+                 businessStart.minusHours(3).toDateTime());
+  }
+
+  @Test
+  public void minusHours_3HoursBeginOfDay_3HoursBeforePreviousDay() {
+    DateTime start = new DateTime(2014, 12, 12, 11, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 11, 16, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 11:00:00:000 minus 3 Hours should return Thursday 16:00:00:000",
+                 expected,
+                 businessStart.minusHours(3).toDateTime());
+  }
+
+  @Test
+  public void minusHours_3Hours3HoursAfterStartOfDay_StartOfDay() {
+    DateTime start = new DateTime(2014, 12, 12, 12, 0, 0, 0);
+    DateTime expected = new DateTime(2014, 12, 12, 9, 0, 0, 0);
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Friday 12:00:00:000 minus 3 Hours should return Friday 9:00:00:000",
+                 expected,
+                 businessStart.minusHours(3).toDateTime());
   }
 }
