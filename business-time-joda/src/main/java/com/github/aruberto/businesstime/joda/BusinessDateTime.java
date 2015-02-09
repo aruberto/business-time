@@ -389,7 +389,6 @@ public final class BusinessDateTime
     if (days == 0) {
       return this;
     } else {
-      long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
       return moveDays(-days);
     }
   }
