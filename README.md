@@ -81,4 +81,51 @@ time.minusMinutes(30); // // Thurs Dec 11, 2014 @ 3:00 PM
 
 ### business-time-jdk8
 
-Sorry, still in the works ...
+The default constructor builds an instance of BusinessDateTime using the current system time, in the system time zone, 9-17 business hours, no holidays and Mon-Fri working week:
+
+```java
+new BusinessDateTime(); // current time
+```
+
+To create an instance of BusinessDateTime that is not current time, simply provide an instance of JDK8's [ZonedDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/ZonedDateTime.html):
+
+```java
+new BusinessDateTime(ZonedDateTime.of(2014, 12, 11, 9, 15, 0, 0, ZoneId.systemDefault())); // Thurs Dec 11, 2014 @ 9:15 AM
+```
+
+If the time specified is outside business hours, BusinessDateTime becomes next possible business moment:
+
+```java
+new BusinessDateTime(ZonedDateTime.of(2014, 12, 11, 8, 45, 0, 0, ZoneId.systemDefault())); // Thurs Dec 11, 2014 @ 9:00 AM since 8:45 AM is before business hours
+new BusinessDateTime(ZonedDateTime.of(2014, 12, 11, 17, 15, 0, 0, ZoneId.systemDefault())); // Fri Dec 12, 2014 @ 9:00 AM since 5:15 PM is after business hours
+new BusinessDateTime(ZonedDateTime.of(2014, 12, 13, 12, 0, 0, 0, ZoneId.systemDefault())); // Mon Dec 15, 2014 @ 9:00 AM since Dec 13 is weekend
+```
+
+If your business doesn't work standard 9-17 hours, provide business day start/end times as instances of JDK8's [LocalTime](https://docs.oracle.com/javase/8/docs/api/java/time/LocalTime.html):
+
+```java
+new BusinessDateTime(LocalTime.of(9, 30, 0, 0), LocalTime.of(17, 30, 0, 0)); // current time with business hours of 9:30-17:30
+```
+
+To specify which days are holidays, provide a set of instances of JDK8's [LocalDate](https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html):
+
+```java
+Set<LocalDate> holidays = new HashSet<>();
+holidays.add(LocalDate.of(2014, 12, 25)); // Christmas
+holidays.add(LocalDate.of(2015, 1, 1)); // New Year
+new BusinessDateTime(holidays); // current time with Christmas and New Year's as holidays
+```
+
+#### Manipulating BusinessDateTime
+
+BusinessDateTime provides a set of plusX and minusX methods to add/subtract time where X is any of Nanos/Seconds/Minutes/Hours/Days/Weeks/Months/Years. Since BusinessDateTime is immutable, all plusX/minusX methods return a new instance of BusinessDateTime:
+
+```java
+BusinessDateTime dateTime = new BusinessDateTime(ZonedDateTime.of(2014, 12, 11, 15, 30, 0, 0, ZoneId.systemDefault())); // Thurs Dec 11, 2014 @ 3:30 PM
+time.plusHours(1); // Thurs Dec 11, 2014 @ 4:30 PM
+time.plusHours(2); // Fri Dec 12, 2014 @ 9:30 AM - remaining 30 min are added to next day
+time.plusMinutes(30); // // Thurs Dec 11, 2014 @ 4:00 PM
+time.minusMinutes(30); // // Thurs Dec 11, 2014 @ 3:00 PM
+```
+
+* note that Weeks/Months/Years methods simply delegate to JDK8's plus/minus methods and perform no business time calculations
