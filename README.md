@@ -20,11 +20,11 @@ In second case, since there are only 1.5 business hours remaining on Thursday, t
 
 ## Projects
 
-### [business-time-common](http://aruberto.github.io/business-time/javadoc/0.1.0/index.html?com/github/aruberto/businesstime/common/package-summary.html)
+### [business-time-common](http://aruberto.github.io/business-time/javadoc/0.1.1/index.html?com/github/aruberto/businesstime/common/package-summary.html)
 
 Common business time calculation methods. Dependency of following projects and not meant to be used directly.
 
-### [business-time-joda](http://aruberto.github.io/business-time/javadoc/0.1.0/index.html?com/github/aruberto/businesstime/joda/package-summary.html)
+### [business-time-joda](http://aruberto.github.io/business-time/javadoc/0.1.1/index.html?com/github/aruberto/businesstime/joda/package-summary.html)
 
 Provides class BusinessDateTime which extends Joda's [AbstractDateTime](http://joda-time.sourceforge.net/apidocs/org/joda/time/base/AbstractDateTime.html).
 
@@ -79,7 +79,7 @@ time.minusMinutes(30); // // Thurs Dec 11, 2014 @ 3:00 PM
 
 * note that Weeks/Months/Years methods simply delegate to Joda's plus/minus methods and perform no business time calculations
 
-### [business-time-jdk8](http://aruberto.github.io/business-time/javadoc/0.1.0/index.html?com/github/aruberto/businesstime/jdk8/package-summary.html)
+### [business-time-jdk8](http://aruberto.github.io/business-time/javadoc/0.1.1/index.html?com/github/aruberto/businesstime/jdk8/package-summary.html)
 
 The default constructor builds an instance of BusinessDateTime using the current system time, in the system time zone, 9-17 business hours, no holidays and Mon-Fri working week:
 

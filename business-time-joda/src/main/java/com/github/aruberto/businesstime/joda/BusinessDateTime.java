@@ -816,7 +816,7 @@ public final class BusinessDateTime
    * @param week the week to set
    * @return a copy of this object with the field set
    */
-  public BusinessDateTime withWorkingWeek(JodaWorkingWeek week) {
+  public BusinessDateTime withWorkingWeek(WorkingWeek week) {
     return new BusinessDateTime(
         dateTime,
         dayStartTime,

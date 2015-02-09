@@ -753,4 +753,66 @@ public final class BusinessDateTime
         workingWeek
     );
   }
+
+  /**
+   * Returns a copy of this datetime with the business day start time field updated.
+   *
+   * @param time the time of day to set
+   * @return a copy of this object with the field set
+   * @throws IllegalArgumentException if the value is invalid
+   */
+  public BusinessDateTime withBusinessDayStartTime(LocalTime time) {
+    return new BusinessDateTime(
+        dateTime,
+        time,
+        dayEndTime,
+        holidays,
+        workingWeek);
+  }
+
+  /**
+   * Returns a copy of this datetime with the business day end time field updated.
+   *
+   * @param time the time of day to set
+   * @return a copy of this object with the field set
+   * @throws IllegalArgumentException if the value is invalid
+   */
+  public BusinessDateTime withBusinessDayEndTime(LocalTime time) {
+    return new BusinessDateTime(
+        dateTime,
+        dayStartTime,
+        time,
+        holidays,
+        workingWeek);
+  }
+
+  /**
+   * Returns a copy of this datetime with the holidays field updated.
+   *
+   * @param dates the set of holidays to set
+   * @return a copy of this object with the field set
+   */
+  public BusinessDateTime withHolidays(Set<LocalDate> dates) {
+    return new BusinessDateTime(
+        dateTime,
+        dayStartTime,
+        dayEndTime,
+        dates,
+        workingWeek);
+  }
+
+  /**
+   * Returns a copy of this datetime with the working week field updated.
+   *
+   * @param week the week to set
+   * @return a copy of this object with the field set
+   */
+  public BusinessDateTime withWorkingWeek(WorkingWeek week) {
+    return new BusinessDateTime(
+        dateTime,
+        dayStartTime,
+        dayEndTime,
+        holidays,
+        week);
+  }
 }
