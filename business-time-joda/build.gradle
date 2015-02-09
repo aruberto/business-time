@@ -10,3 +10,11 @@ dependencies {
 
   testCompile 'junit:junit:4.12'
 }
+
+task zip(dependsOn: jar, type: Zip) {
+    from configurations.runtime.allArtifacts.files
+    from configurations.runtime
+    into(project.name + '-' + project.version)
+}
+
+build.dependsOn zip

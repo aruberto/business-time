@@ -1,7 +1,3 @@
-plugins {
-    id 'net.researchgate.release' version '2.0.0'
-}
-
 subprojects {
   apply plugin: 'java'
 
