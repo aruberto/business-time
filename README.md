@@ -79,7 +79,7 @@ time.minusMinutes(30); // // Thurs Dec 11, 2014 @ 3:00 PM
 
 * note that Weeks/Months/Years methods simply delegate to Joda's plus/minus methods and perform no business time calculations
 
-### [business-time-jdk8]((http://aruberto.github.io/business-time/javadoc/0.1.0/index.html?com/github/aruberto/businesstime/jdk8/package-summary.html))
+### [business-time-jdk8](http://aruberto.github.io/business-time/javadoc/0.1.0/index.html?com/github/aruberto/businesstime/jdk8/package-summary.html)
 
 The default constructor builds an instance of BusinessDateTime using the current system time, in the system time zone, 9-17 business hours, no holidays and Mon-Fri working week:
 
