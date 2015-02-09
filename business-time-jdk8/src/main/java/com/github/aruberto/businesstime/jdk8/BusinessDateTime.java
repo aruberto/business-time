@@ -19,20 +19,16 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.chrono.ChronoLocalDateTime;
 import java.time.chrono.ChronoZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalField;
 import java.time.temporal.TemporalUnit;
 import java.util.Collections;
 import java.util.Set;
 
-import static java.time.LocalTime.MICROS_PER_DAY;
-import static java.time.LocalTime.MILLIS_PER_DAY;
-
 public final class BusinessDateTime
     implements Temporal, ChronoZonedDateTime<LocalDate>, Serializable {
 
-  private static final long serialVersionUID = 1732686151695655244L;
+  private static final long serialVersionUID = -4192005765453687618L;
 
   private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(9, 0, 0, 0);
   private static final LocalTime DEFAULT_BUSINESS_DAY_END = LocalTime.of(17, 0, 0, 0);
@@ -182,30 +178,56 @@ public final class BusinessDateTime
     this(ZonedDateTime.now(), null, null, null, null);
   }
 
-  private BusinessDateTime moveByMillis(long millisToMove) {
-    DateCalculator<LocalDate> calc = new LocalDateKitCalculatorsFactory()
+  private DateCalculator<LocalDate> getDateCalculator() {
+    return new LocalDateKitCalculatorsFactory()
         .registerHolidays(Constants.HOLIDAY_KEY, new DefaultHolidayCalendar<>(holidays))
         .getDateCalculator(Constants.HOLIDAY_KEY, HolidayHandlerType.FORWARD_UNLESS_MOVING_BACK)
         .setWorkingWeek(workingWeek);
+  }
+
+  private BusinessDateTime fromResult(BusinessDateTimeCalculatorResult<LocalDate> result) {
+    ZonedDateTime endDateTime = result.getEndDate()
+        .atStartOfDay(dateTime.getZone())
+        .plusNanos(result.getNanosOfDay());
+    return new BusinessDateTime(endDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
+  }
+
+  private BusinessDateTime move(long unitsToMove, long unitFactor) {
+    DateCalculator<LocalDate> calc = getDateCalculator();
 
     BusinessDateTimeCalculator<LocalDate> businessCalc =
         new BusinessDateTimeCalculator<LocalDate>();
-    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.moveByMillis(
+    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.move(
         dateTime.toLocalDate(),
-        dateTime.toLocalTime().getNano(),
-        millisToMove,
-        dayStartTime.getNano(),
-        dayEndTime.getNano(),
+        dateTime.toLocalTime().toNanoOfDay(),
+        unitsToMove,
+        unitFactor,
+        dayStartTime.toNanoOfDay(),
+        dayEndTime.toNanoOfDay(),
         calc);
 
-    LocalTime endTime = LocalTime.of(0, 0, 0, 0).plusNanos(result.getMillisOfDay());
-    ZonedDateTime endDateTime = result.getEndDate().atTime(endTime).atZone(dateTime.getZone());
-    return new BusinessDateTime(endDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
+    return fromResult(result);
+  }
+
+  private BusinessDateTime moveDays(int days) {
+    DateCalculator<LocalDate> calc = getDateCalculator();
+
+    BusinessDateTimeCalculator<LocalDate> businessCalc =
+        new BusinessDateTimeCalculator<LocalDate>();
+    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.moveDays(
+        dateTime.toLocalDate(),
+        dateTime.toLocalTime().toNanoOfDay(),
+        days,
+        dayStartTime.toNanoOfDay(),
+        dayEndTime.toNanoOfDay(),
+        calc);
+
+    return fromResult(result);
   }
 
   @Override
   public ChronoLocalDateTime<LocalDate> toLocalDateTime() {
-    return moveByMillis(0).dateTime.toLocalDateTime();
+    return move(0, Constants.NANOS_PER_NANO).dateTime.toLocalDateTime();
   }
 
   @Override
@@ -301,7 +323,7 @@ public final class BusinessDateTime
 
   @Override
   public long until(Temporal endExclusive, TemporalUnit unit) {
-    return moveByMillis(0).dateTime.until(endExclusive, unit);
+    return move(0, Constants.NANOS_PER_NANO).dateTime.until(endExclusive, unit);
   }
 
   @Override

@@ -6,19 +6,20 @@ package com.github.aruberto.businesstime.common;
  * @param <E> the type of date object
  */
 public class BusinessDateTimeCalculatorResult<E> {
-  protected E endDate;
-  protected int millisOfDay;
 
-  public BusinessDateTimeCalculatorResult(E endDate, int millisOfDay) {
+  protected E endDate;
+  protected long nanosOfDay;
+
+  public BusinessDateTimeCalculatorResult(E endDate, long nanosOfDay) {
     this.endDate = endDate;
-    this.millisOfDay = millisOfDay;
+    this.nanosOfDay = nanosOfDay;
   }
 
   public E getEndDate() {
     return endDate;
   }
 
-  public int getMillisOfDay() {
-    return millisOfDay;
+  public long getNanosOfDay() {
+    return nanosOfDay;
   }
 }

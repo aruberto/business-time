@@ -37,7 +37,7 @@ public final class BusinessDateTime
     extends AbstractDateTime
     implements ReadableDateTime, Serializable {
 
-  private static final long serialVersionUID = -9186202461058242569L;
+  private static final long serialVersionUID = -3723047285204294709L;
 
   private static final LocalTime DEFAULT_BUSINESS_DAY_START = new LocalTime(9, 0, 0, 0);
   private static final LocalTime DEFAULT_BUSINESS_DAY_END = new LocalTime(17, 0, 0, 0);
@@ -187,25 +187,51 @@ public final class BusinessDateTime
     this(new DateTime(), null, null, null, null);
   }
 
-  private BusinessDateTime moveByMillis(long millisToMove) {
-    DateCalculator<LocalDate> calc = new LocalDateKitCalculatorsFactory()
+  private DateCalculator<LocalDate> getDateCalculator() {
+    return new LocalDateKitCalculatorsFactory()
         .registerHolidays(Constants.HOLIDAY_KEY, new DefaultHolidayCalendar<LocalDate>(holidays))
         .getDateCalculator(Constants.HOLIDAY_KEY, HolidayHandlerType.FORWARD_UNLESS_MOVING_BACK)
         .setWorkingWeek(workingWeek);
+  }
+
+  private BusinessDateTime fromResult(BusinessDateTimeCalculatorResult<LocalDate> result) {
+    LocalTime endTime = new LocalTime(0, 0, 0, 0)
+        .plusMillis((int) (result.getNanosOfDay() / Constants.NANOS_PER_MILLI));
+    DateTime endDateTime = result.getEndDate().toDateTime(endTime, dateTime.getZone());
+    return new BusinessDateTime(endDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
+  }
+
+  private BusinessDateTime move(long unitsToMove, long unitFactor) {
+    DateCalculator<LocalDate> calc = getDateCalculator();
 
     BusinessDateTimeCalculator<LocalDate> businessCalc =
         new BusinessDateTimeCalculator<LocalDate>();
-    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.moveByMillis(
+    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.move(
         dateTime.toLocalDate(),
-        dateTime.toLocalTime().getMillisOfDay(),
-        millisToMove,
-        dayStartTime.getMillisOfDay(),
-        dayEndTime.getMillisOfDay(),
+        dateTime.toLocalTime().getMillisOfDay() * Constants.NANOS_PER_MILLI,
+        unitsToMove,
+        unitFactor,
+        dayStartTime.getMillisOfDay() * Constants.NANOS_PER_MILLI,
+        dayEndTime.getMillisOfDay() * Constants.NANOS_PER_MILLI,
         calc);
 
-    LocalTime endTime = new LocalTime(0, 0, 0, 0).plusMillis(result.getMillisOfDay());
-    DateTime endDateTime = result.getEndDate().toDateTime(endTime, dateTime.getZone());
-    return new BusinessDateTime(endDateTime, dayStartTime, dayEndTime, holidays, workingWeek);
+    return fromResult(result);
+  }
+
+  private BusinessDateTime moveDays(int days) {
+    DateCalculator<LocalDate> calc = getDateCalculator();
+
+    BusinessDateTimeCalculator<LocalDate> businessCalc =
+        new BusinessDateTimeCalculator<LocalDate>();
+    BusinessDateTimeCalculatorResult<LocalDate> result = businessCalc.moveDays(
+        dateTime.toLocalDate(),
+        dateTime.toLocalTime().getMillisOfDay() * Constants.NANOS_PER_MILLI,
+        days,
+        dayStartTime.getMillisOfDay() * Constants.NANOS_PER_MILLI,
+        dayEndTime.getMillisOfDay() * Constants.NANOS_PER_MILLI,
+        calc);
+
+    return fromResult(result);
   }
 
   /**
@@ -224,7 +250,7 @@ public final class BusinessDateTime
    * @return the number of milliseconds since 1970-01-01T00:00:00Z
    */
   public long getMillis() {
-    return moveByMillis(0).dateTime.getMillis();
+    return move(0, Constants.NANOS_PER_NANO).dateTime.getMillis();
   }
 
   /**
@@ -237,7 +263,7 @@ public final class BusinessDateTime
     if (millis == 0) {
       return this;
     } else {
-      return moveByMillis(millis);
+      return move(millis, Constants.NANOS_PER_MILLI);
     }
   }
 
@@ -251,7 +277,7 @@ public final class BusinessDateTime
     if (millis == 0) {
       return this;
     } else {
-      return moveByMillis(-millis);
+      return move(-millis, Constants.NANOS_PER_MILLI);
     }
   }
 
@@ -265,7 +291,7 @@ public final class BusinessDateTime
     if (seconds == 0) {
       return this;
     } else {
-      return moveByMillis(seconds * Constants.MILLIS_PER_SECOND);
+      return move(seconds, Constants.NANOS_PER_SECOND);
     }
   }
 
@@ -279,7 +305,7 @@ public final class BusinessDateTime
     if (seconds == 0) {
       return this;
     } else {
-      return moveByMillis(-seconds * Constants.MILLIS_PER_SECOND);
+      return move(-seconds, Constants.NANOS_PER_SECOND);
     }
   }
 
@@ -293,7 +319,7 @@ public final class BusinessDateTime
     if (minutes == 0) {
       return this;
     } else {
-      return moveByMillis(minutes * Constants.MILLIS_PER_MINUTE);
+      return move(minutes, Constants.NANOS_PER_MINUTE);
     }
   }
 
@@ -307,7 +333,7 @@ public final class BusinessDateTime
     if (minutes == 0) {
       return this;
     } else {
-      return moveByMillis(-minutes * Constants.MILLIS_PER_MINUTE);
+      return move(-minutes, Constants.NANOS_PER_MINUTE);
     }
   }
 
@@ -321,7 +347,7 @@ public final class BusinessDateTime
     if (hours == 0) {
       return this;
     } else {
-      return moveByMillis(hours * Constants.MILLIS_PER_HOUR);
+      return move(hours, Constants.NANOS_PER_HOUR);
     }
   }
 
@@ -335,7 +361,7 @@ public final class BusinessDateTime
     if (hours == 0) {
       return this;
     } else {
-      return moveByMillis(-hours * Constants.MILLIS_PER_HOUR);
+      return move(-hours, Constants.NANOS_PER_HOUR);
     }
   }
 
@@ -349,8 +375,7 @@ public final class BusinessDateTime
     if (days == 0) {
       return this;
     } else {
-      long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
-      return moveByMillis(days * millisPerDay);
+      return moveDays(days);
     }
   }
 
@@ -365,7 +390,7 @@ public final class BusinessDateTime
       return this;
     } else {
       long millisPerDay = dayEndTime.getMillisOfDay() - dayStartTime.getMillisOfDay();
-      return moveByMillis(-days * millisPerDay);
+      return moveDays(-days);
     }
   }
 
