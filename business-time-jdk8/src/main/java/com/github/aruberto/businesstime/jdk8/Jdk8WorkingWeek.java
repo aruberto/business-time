@@ -4,7 +4,7 @@ import net.objectlab.kit.datecalc.common.WorkingWeek;
 
 import java.io.Serializable;
 
-public class Jdk8WorkingWeek
+class Jdk8WorkingWeek
     extends net.objectlab.kit.datecalc.jdk8.Jdk8WorkingWeek
     implements Serializable {
 
