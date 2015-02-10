@@ -356,6 +356,11 @@ public final class BusinessDateTime
     return move(0, Constants.NANOS_PER_NANO).dateTime.hashCode();
   }
 
+  @Override
+  public String toString() {
+    return move(0, Constants.NANOS_PER_NANO).dateTime.toString();
+  }
+
   public ZonedDateTime toZonedDateTime() {
     return move(0, Constants.NANOS_PER_NANO).dateTime;
   }
