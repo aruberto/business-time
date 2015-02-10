@@ -8,7 +8,6 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
 import net.objectlab.kit.datecalc.common.WorkingWeek;
-import net.objectlab.kit.datecalc.joda.JodaWorkingWeek;
 import net.objectlab.kit.datecalc.joda.LocalDateKitCalculatorsFactory;
 
 import org.joda.time.Chronology;
@@ -37,7 +36,7 @@ public final class BusinessDateTime
     extends AbstractDateTime
     implements ReadableDateTime, Serializable {
 
-  private static final long serialVersionUID = -3723047285204294709L;
+  private static final long serialVersionUID = 2772583488704943606L;
 
   private static final LocalTime DEFAULT_BUSINESS_DAY_START = new LocalTime(9, 0, 0, 0);
   private static final LocalTime DEFAULT_BUSINESS_DAY_END = new LocalTime(17, 0, 0, 0);

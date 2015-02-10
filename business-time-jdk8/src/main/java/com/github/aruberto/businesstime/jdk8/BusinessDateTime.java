@@ -8,7 +8,6 @@ import net.objectlab.kit.datecalc.common.DateCalculator;
 import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
 import net.objectlab.kit.datecalc.common.HolidayHandlerType;
 import net.objectlab.kit.datecalc.common.WorkingWeek;
-import net.objectlab.kit.datecalc.jdk8.Jdk8WorkingWeek;
 import net.objectlab.kit.datecalc.jdk8.LocalDateKitCalculatorsFactory;
 
 import java.io.Serializable;
@@ -40,7 +39,7 @@ import java.util.Set;
 public final class BusinessDateTime
     implements Temporal, ChronoZonedDateTime<LocalDate>, Serializable {
 
-  private static final long serialVersionUID = -4192005765453687618L;
+  private static final long serialVersionUID = -7158714391819702156L;
 
   private static final LocalTime DEFAULT_BUSINESS_DAY_START = LocalTime.of(9, 0, 0, 0);
   private static final LocalTime DEFAULT_BUSINESS_DAY_END = LocalTime.of(17, 0, 0, 0);
@@ -337,6 +336,24 @@ public final class BusinessDateTime
   @Override
   public boolean isSupported(TemporalField field) {
     return dateTime.isSupported(field);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj instanceof BusinessDateTime) {
+      BusinessDateTime other = (BusinessDateTime) obj;
+      return move(0, Constants.NANOS_PER_NANO).dateTime
+          .equals(other.move(0, Constants.NANOS_PER_NANO).dateTime);
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return move(0, Constants.NANOS_PER_NANO).dateTime.hashCode();
   }
 
   public ZonedDateTime toZonedDateTime() {

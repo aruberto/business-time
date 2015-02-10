@@ -2,6 +2,10 @@ package com.github.aruberto.businesstime.jdk8;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -392,5 +396,21 @@ public class BusinessDateTimeTest {
     assertEquals("Tuesday 12:00:00.0 minus 3 Days should return Thursday 12:00:00.0",
                  expected,
                  businessStart.minusDays(3).toZonedDateTime());
+  }
+
+  @Test
+  public void readWriteObject_CurrentTime_CurrentTime() throws Exception {
+    BusinessDateTime dateTime = new BusinessDateTime();
+
+    ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+    ObjectOutputStream inputStream = new ObjectOutputStream(byteStream);
+    inputStream.writeObject(dateTime);
+    inputStream.close();
+
+    ObjectInputStream outputStream =
+        new ObjectInputStream(new ByteArrayInputStream(byteStream.toByteArray()));
+    Object o  = outputStream.readObject();
+
+    assertEquals("Serialize and de-serialize should return itself", dateTime, o);
   }
 }
