@@ -399,6 +399,50 @@ public class BusinessDateTimeTest {
   }
 
   @Test
+  public void plusMinutes_Weekend_DayAfterWeekend() {
+    ZonedDateTime start = ZonedDateTime.of(2017, 6, 24, 0, 0, 0, 0, ZoneId.systemDefault());
+    ZonedDateTime expected = ZonedDateTime.of(2017, 6, 26, 9, 35, 0, 0, ZoneId.systemDefault());
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Saturday 00:00:00.0 plus 35 minutes should return Monday 9:35:00.0",
+                 expected,
+                 businessStart.plusMinutes(35).toZonedDateTime());
+  }
+
+  @Test
+  public void plusMinutes_Weekend_2DayAfterWeekend() {
+    ZonedDateTime start = ZonedDateTime.of(2017, 6, 24, 0, 0, 0, 0, ZoneId.systemDefault());
+    ZonedDateTime expected = ZonedDateTime.of(2017, 6, 27, 9, 35, 0, 0, ZoneId.systemDefault());
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Saturday 00:00:00.0 minus 515 minutes should return Tuesday 9:35:00.0",
+                 expected,
+                 businessStart.plusMinutes(515).toZonedDateTime());
+  }
+
+  @Test
+  public void minusMinutes_Weekend_DayBeforeWeekend() {
+    ZonedDateTime start = ZonedDateTime.of(2017, 6, 24, 0, 0, 0, 0, ZoneId.systemDefault());
+    ZonedDateTime expected = ZonedDateTime.of(2017, 6, 23, 16, 25, 0, 0, ZoneId.systemDefault());
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Saturday 00:00:00.0 minus 35 minutes should return Friday 16:25:00.0",
+                 expected,
+                 businessStart.minusMinutes(35).toZonedDateTime());
+  }
+
+  @Test
+  public void minusMinutes_Weekend_2DayBeforeWeekend() {
+    ZonedDateTime start = ZonedDateTime.of(2017, 6, 24, 0, 0, 0, 0, ZoneId.systemDefault());
+    ZonedDateTime expected = ZonedDateTime.of(2017, 6, 22, 16, 25, 0, 0, ZoneId.systemDefault());
+    BusinessDateTime businessStart = new BusinessDateTime(start);
+
+    assertEquals("Saturday 00:00:00.0 minus 515 minutes should return Thursday 16:25:00.0",
+                 expected,
+                 businessStart.minusMinutes(515).toZonedDateTime());
+  }
+
+  @Test
   public void readWriteObject_CurrentTime_CurrentTime() throws Exception {
     BusinessDateTime dateTime = new BusinessDateTime();
 

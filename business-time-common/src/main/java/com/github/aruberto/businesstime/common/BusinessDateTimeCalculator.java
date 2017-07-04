@@ -136,6 +136,12 @@ public class BusinessDateTimeCalculator<E> {
     if (!moveForward) {
       days = -days;
       nanosOfDay = -nanosOfDay;
+
+      if (!isWorkingDay) {
+        // if we are moving backwards from a non work day,
+        // subtract another day to adjust for DateCalc automatically moving to next business day
+        days -= 1;
+      }
     }
 
     // Use DateCalculator to calculate new business day
